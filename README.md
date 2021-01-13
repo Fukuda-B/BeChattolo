@@ -55,4 +55,4 @@ style.css
 chat.php
 main.html
 
-© 2020- Fukuda-B.
+© 2020- Fukuda-B. (Excluding font data.)
