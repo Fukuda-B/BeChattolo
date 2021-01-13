@@ -54,3 +54,5 @@ style.css
 // Ajaxメインです<br>
 chat.php
 main.html
+
+© 2020- Fukuda-B.
