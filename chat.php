@@ -167,9 +167,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // POSTでは全関数実行可能
       case 'dir': // ディレクトリ一覧&更新日時取得
         header( "Content-Type: application/json; charset=utf-8" ); // JSONデータであることをヘッダ追加する
         header("Content-Encoding: gzip");
-        echo gzencode(json_encode(GetDir()) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
-        // echo gzencode(json_encode(GetDir(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
-        // echo json_encode(GetDir(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+        echo gzencode(json_encode(GetDirList()) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
+        // echo gzencode(json_encode(GetDirList(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
+        // echo json_encode(GetDirList(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
       break;
       case 'mes': // メッセージ取得
         header( "Content-Type: application/json; charset=utf-8" ); // JSONデータであることをヘッダ追加する
@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // POSTでは全関数実行可能
         header("Content-Encoding: gzip");
         AddMes(filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'type', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'contents', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'media', FILTER_SANITIZE_FULL_SPECIAL_CHARS));
         autoSplit(filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW)); // 自動分割
-        echo gzencode(json_encode(GetDir()) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
+        echo gzencode(json_encode(GetDirList()) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
       break;
       case 'edt': // メッセージ編集(削除)
         header( "Content-Type: application/json; charset=utf-8" ); // JSONデータであることをヘッダ追加する
@@ -198,8 +198,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // POSTでは全関数実行可能
         // echo gzencode(json_encode(EdtMes(filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'thread', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'id', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'type', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'contents', FILTER_SANITIZE_FULL_SPECIAL_CHARS))) , COMPRESS_LV);
         // echo json_encode(EdtMes(filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'thread', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'id', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'type', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'contents', FILTER_SANITIZE_FULL_SPECIAL_CHARS)));
         EdtMes(filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'thread', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'id', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'type', FILTER_SANITIZE_FULL_SPECIAL_CHARS), filter_input(INPUT_POST, 'contents', FILTER_SANITIZE_FULL_SPECIAL_CHARS));
-        echo gzencode(json_encode(GetDir()) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
-        // echo json_encode(GetDir());  // .htaccessを操作できずgzipできないサーバー向け
+        echo gzencode(json_encode(GetDirList()) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
+        // echo json_encode(GetDirList());  // .htaccessを操作できずgzipできないサーバー向け
       break;
       case 'del': // ルーム(削除) // アクセス不可にする
         DelRoom(filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS));
@@ -234,8 +234,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // POSTでは全関数実行可能
   } elseif (filter_input(INPUT_GET, 'dir')) {
     header( "Content-Type: application/json; charset=utf-8" ); // JSONデータであることをヘッダ追加する
     header("Content-Encoding: gzip");
-    echo gzencode(json_encode(GetDir()) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
-    // echo json_encode(GetDir(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+    echo gzencode(json_encode(GetDirList()) , COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
+    // echo json_encode(GetDirList(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
   } elseif (filter_input(INPUT_GET, 'setid_room')) { // setIdのためだけ
     setId(filter_input(INPUT_GET, 'setid_room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW));
     echo GetMes(filter_input(INPUT_GET, 'setid_room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_GET, 'thread', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW));
@@ -394,7 +394,7 @@ function EdtMes($room, $thread, $id, $name, $type, $contents) { // $no は 配�
 }
 
 // ----- ディレクトリ一覧を取得 -----
-function GetDir() {
+function GetDirList() {
   $rdir_list = scandir("./".BBS_FOLDER."/");
   $ret_arr=array(); // 戻り値用の変数を初期化
   $count_s = count($rdir_list); // 存在数を変数に代入しておく
@@ -587,14 +587,14 @@ function ip_hex() {
 // ----- SSE RoomListの更新を監視します
 function SseDir() {
   // while (ob_get_level()) { ob_end_clean(); }
-  $oldDir = GetDir();
+  $oldDir = GetDirList();
   // echo 'data: '.json_encode($oldDir, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE)."\n\n";
   // ob_flush();
   // flush();
   $counter = 0;
   // while (!connection_aborted()) { // 接続中は継続
   while (true) { // 接続中は継続
-      $nowDir = GetDir();
+      $nowDir = GetDirList();
     if ($oldDir !== $nowDir) {
       echo 'data: '.json_encode($nowDir, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE)."\n\n";
       ob_flush();
