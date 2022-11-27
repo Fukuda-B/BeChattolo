@@ -56,6 +56,11 @@ From: Markdownチートシート
 ## これはH2タグ
 
 // ----- 更新履歴 -----
+Ver.0.8.37
+AzureがPHP7.4サポート終了のため，とりあえずPHP8で書き換えた
+Room作成時にid_offsetが書き込まれないバグの修正
+ローカル内でRoom数(MainRoomを含む)が10を超えたときの表示順を修正
+
 Ver.0.8.36?でメッセージの編集ができるようになりました
 
 Ver.0.8.30?
@@ -150,13 +155,18 @@ first_roomc(); // MainRoomを作らないと始まらないよ。
 if ($_SERVER['REQUEST_METHOD'] === 'POST') { // POSTでは全関数実行可能
 //  if(isset($_POST['req'])) {
   if (filter_input(INPUT_POST, 'req')) {
-
     if (filter_input(INPUT_POST, 'room')) {
-      if (is_file("./".BBS_FOLDER."/".filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW)."/".PROTECTED_ROOM)) { // アクセスしてよいか判定
+      $ipost_room = htmlspecialchars(
+        filter_input(
+          INPUT_POST,
+          'room',
+          FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_BACKTICK | FILTER_FLAG_STRIP_HIGH)
+      );
+      if (is_file("./".BBS_FOLDER."/".$ipost_room."/".PROTECTED_ROOM)) { // アクセスしてよいか判定
         header("HTTP/1.0 403 Forbidden");
         echo 'ERROR: "Room" has been deleted.';
         exit;
-      } elseif (!is_dir("./".BBS_FOLDER."/".filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW))) { // ディレクトリが存在しない
+      } elseif (!is_dir("./".BBS_FOLDER."/".$ipost_room)) { // ディレクトリが存在しない
         header("HTTP/1.0 403 Forbidden");
         echo 'ERROR: Requested "Room" does not exist.';
         exit;
@@ -174,7 +184,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') { // POSTでは全関数実行可能
       case 'mes': // メッセージ取得
         header( "Content-Type: application/json; charset=utf-8" ); // JSONデータであることをヘッダ追加する
         header("Content-Encoding: gzip");
-        echo gzencode(GetMes(filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'thread', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW)),COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
+        $ipost_room = htmlspecialchars(
+          filter_input(INPUT_POST,
+          'room',
+          FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_BACKTICK | FILTER_FLAG_STRIP_HIGH));
+        $ipost_thread = htmlspecialchars(
+          filter_input(INPUT_POST,
+          'thread',
+          FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_BACKTICK | FILTER_FLAG_STRIP_HIGH));
+        echo gzencode(GetMes($ipost_room, $ipost_thread), COMPRESS_LV);  // .htaccessを操作できずgzipできないサーバー向け
         // echo json_encode(GetMes(filter_input(INPUT_POST, 'room', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW), filter_input(INPUT_POST, 'thread', FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW)));
       break;
       case 'mes_dif': // メッセージ差分取得
@@ -396,7 +414,7 @@ function EdtMes($room, $thread, $id, $name, $type, $contents) { // $no は 配�
 // ----- ディレクトリ一覧を取得 -----
 function GetDirList() {
   $rdir_list = scandir("./".BBS_FOLDER."/");
-  $ret_arr=array(); // 戻り値用の変数を初期化
+  $ret_arr = array(); // 戻り値用の変数を初期化
   $count_s = count($rdir_list); // 存在数を変数に代入しておく
   for ($i=2; $i < $count_s; ++$i) { // ,/, ../ を含むので$i=2
     if (is_dir("./".BBS_FOLDER."/".$rdir_list[$i]) && !is_file("./".BBS_FOLDER."/".$rdir_list[$i]."/".PROTECTED_ROOM)) { // ディレクトリ, アクセス可能か
@@ -406,7 +424,7 @@ function GetDirList() {
       } else {
         $l_meth = "./".BBS_FOLDER."/".$rdir_list[$i];
       }
-      $ret_arr[] = array(
+      $ret_arr[$rdir_list[$i]] = array(
         'dir_name' => $rdir_list[$i],
         'room_name' => GetRoomName($rdir_list[$i]),
         'l_date' => date("YmdHis" ,filemtime($l_meth)),
@@ -414,7 +432,14 @@ function GetDirList() {
       );
     }
   }
-  return $ret_arr;
+  ksort($ret_arr); # 連想配列のキーでソート
+  $ret_arr_numbering = array();
+  $ret_arr_numbering[] = $ret_arr[MAIN_ROOM_DIR]; # 最初にMainRoomが来るように追加
+  foreach($ret_arr as $ret_k => $ret_val){
+    if ($ret_k == MAIN_ROOM_DIR) { continue; }
+    $ret_arr_numbering[] = $ret_val;
+  }
+  return $ret_arr_numbering;
 }
 
 // ----- RoomNameを取得する -----
@@ -484,7 +509,7 @@ function SetRoom($mode, $name, $room, $new_name, $new_descr) {
           'thread' => 0,
           'object' => array(),
           'descr' => $new_descr,
-          'ip_offset' => 0
+          'id_offset' => 0
         );
         // データを追加して保存
         $up_log = array(
@@ -578,6 +603,7 @@ function ip_hex() {
       $ip_p = explode('.',$_SERVER["REMOTE_ADDR"]);
       $ip_hex="";
       foreach($ip_p as $val) {
+        if (is_string($val)) { $val = 0; } # IPが変換できないとき用
         $ip_hex = $ip_hex.'.'.dechex($val);
       }
       unset($val);
@@ -596,6 +622,7 @@ function SseDir() {
   while (true) { // 接続中は継続
       $nowDir = GetDirList();
     if ($oldDir !== $nowDir) {
+      ob_start();
       echo 'data: '.json_encode($nowDir, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE)."\n\n";
       ob_flush();
       flush();
@@ -606,12 +633,14 @@ function SseDir() {
     }
     if ($counter*CK_TIMING < CK_UP*60) {
       if ($counter%5 === 4) {
+        ob_start();
         echo ':'."\n\n"; // KeepStream
         ob_flush();
         flush();
       }
       sleep(CK_TIMING);
     } else {
+      ob_start();
       echo ':'."\n\n"; // KeepStream
       ob_flush();
       flush();

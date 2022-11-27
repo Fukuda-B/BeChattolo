@@ -17,22 +17,10 @@ const MAX_SEND_SIZE = 3003; // 最大送信サイズ 0xBBB
 const READ_AHEAD = 400; // 先読みを行う残りpx条件
 const PUSH_TIMER = 3000; // Push通知の表示時間
 const SEND_SERVER = 'chat.php';
-// const SEND_SERVER = 'https://u2api.azurewebsites.net/chat/chat.php'; // POSTする試験サーバURL
-// const SEND_SERVER = 'https://u2net.azurewebsites.net/chat/chat.php'; // POSTする本番サーバURL
-// const SEND_SERVER = 'http://fukube.biz.ht/chat/chat.php'; // POSTする本番サーバ2URL
-// const SEND_SERVER = 'http://fukube.biz.ht/chat_dev/chat.php';
-// const SEND_SERVER = 'https://u2star.azurewebsites.net/chat/chat.php'; // 新しい本番サーバ
-// const SEND_SERVER = 'https://u2dev.azurewebsites.net/chat/chat.php'; // 新しい試験サーバ
 const M_NOTICE_JS = './res/m_notice.min.js'; // 通知用のjsファイル
-// const M_NOTICE_JS = 'https://cdn.discordapp.com/attachments/705099416083890281/705100136950530188/m_notice.min.js';
 const STYLE_CSS = 'style.min.css'; // メインのCSS
-// const STYLE_CSS = 'https://cdn.discordapp.com/attachments/705099416083890281/716599609107021864/style.min.css';
-// const THEME_DEEPBLACK_CSS = './res/theme_deepblack.css';
 const THEME_DEEPBLACK_CSS = './res/theme_deepblack.min.css';
-// const THEME_DEEPBLACK_CSS = 'https://cdn.discordapp.com/attachments/705099416083890281/716625749678751744/theme_deepblack.min.css';
-// const THEME_WHITE_CSS = './res/theme_white.css';
 const THEME_WHITE_CSS = './res/theme_white.min.css';
-// const THEME_WHITE_CSS = 'https://cdn.discordapp.com/attachments/705099416083890281/716625740820512788/theme_white.min.css';
 
 // phpへのリクエスト種類
 const ADD_MES = 'add'; // メッセージの追加
